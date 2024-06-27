@@ -1,3 +1,4 @@
+using UnityEngine;
 using KaifGames.TestClicker.LevelProgression;
 using KaifGames.TestClicker.ManualEarning;
 using KaifGames.TestClicker.UI.Window;
@@ -67,6 +68,7 @@ namespace KaifGames.TestClicker.UI.MainWindow
         private void OnEarnClicked()
         {
             _manualEarner.Earn();
+            _view.CreateClickPopup(_manualEarningPower.MoneyPerClick, Input.mousePosition);
         }
     }
 }

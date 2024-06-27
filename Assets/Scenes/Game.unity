@@ -681,6 +681,9 @@ MonoBehaviour:
   _clickPowerText: {fileID: 1453157269}
   _levelText: {fileID: 1272176594}
   _levelBarFill: {fileID: 918187509}
+  _clickPopupPrefab: {fileID: 3393337895156579432, guid: 4503d79c5a520df4ca679e4f2b0e6d3c, type: 3}
+  _clickPopupsHolder: {fileID: 353245196}
+  _clickPopupLifetime: 1
 --- !u!1 &445766177
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -11,6 +12,11 @@ namespace KaifGames.TestClicker.UI.MainWindow
         [SerializeField] private TMP_Text _clickPowerText;
         [SerializeField] private TMP_Text _levelText;
         [SerializeField] private Image _levelBarFill;
+
+        [Header("Click popup")]
+        [SerializeField] private GameObject _clickPopupPrefab;
+        [SerializeField] private Transform _clickPopupsHolder;
+        [SerializeField] private float _clickPopupLifetime = 1f;
 
         public event System.Action EarnClicked;
 
@@ -38,6 +44,19 @@ namespace KaifGames.TestClicker.UI.MainWindow
         {
             _clickPowerText.text = $"{clickPower}/per click";
         } 
+
+        public void CreateClickPopup(int clickPower, Vector2 screenPosition)
+        {
+            var popup = Instantiate(_clickPopupPrefab, _clickPopupsHolder);
+            popup.transform.position = screenPosition;
+            popup.transform.DOMoveY(screenPosition.y + 200f, _clickPopupLifetime);
+
+            var text = popup.GetComponent<TMP_Text>();
+            text.text = $"+{clickPower}";
+            text.DOFade(0f, _clickPopupLifetime);
+
+            Destroy(popup, _clickPopupLifetime + 0.1f);
+        }
 
         private void OnEarnClicked()
         {

@@ -21,7 +21,10 @@ namespace KaifGames.TestClicker.UI.WindowToggle
 
         public void Hide()
         {
-            _view.SetSelected(false);
+            if (_view != null)
+            {
+                _view.SetSelected(false);
+            }
             _view.Selected -= OnSelected;
             _model.Window.Activated -= OnWindowActivated;
             _model.Window.Deactivated -= OnWindowDeactivated;

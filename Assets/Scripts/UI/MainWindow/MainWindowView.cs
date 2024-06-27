@@ -1,8 +1,11 @@
+using System.Collections;
+using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using KaifGames.TestClicker.UI.Window;
+using KaifGames.TestClicker.UI.Elements;
 
 namespace KaifGames.TestClicker.UI.MainWindow
 {
@@ -20,9 +23,17 @@ namespace KaifGames.TestClicker.UI.MainWindow
 
         public event System.Action EarnClicked;
 
+        private ObjectPool _clickPopupsPool;
+
         private void Awake()
         {
             _earnButton.onClick.AddListener(OnEarnClicked);
+            _clickPopupsPool = new(_clickPopupPrefab);
+        }
+
+        private void OnDisable()
+        {
+            _clickPopupsPool.SoftDestroyActive();
         }
 
         public void SetActive(bool isActive)
@@ -47,20 +58,27 @@ namespace KaifGames.TestClicker.UI.MainWindow
 
         public void CreateClickPopup(int clickPower, Vector2 screenPosition)
         {
-            var popup = Instantiate(_clickPopupPrefab, _clickPopupsHolder);
+            var popup = _clickPopupsPool.Instantiate(_clickPopupsHolder);
             popup.transform.position = screenPosition;
             popup.transform.DOMoveY(screenPosition.y + 200f, _clickPopupLifetime);
 
             var text = popup.GetComponent<TMP_Text>();
             text.text = $"+{clickPower}";
+            text.alpha = 1f;
             text.DOFade(0f, _clickPopupLifetime);
 
-            Destroy(popup, _clickPopupLifetime + 0.1f);
+            StartCoroutine(DestroyClickPopupCor(popup, _clickPopupLifetime + 0.1f));
         }
 
         private void OnEarnClicked()
         {
             EarnClicked?.Invoke();
+        }
+
+        private IEnumerator DestroyClickPopupCor(GameObject clickPopup, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            _clickPopupsPool.SoftDestroy(clickPopup);
         }
     }
 }

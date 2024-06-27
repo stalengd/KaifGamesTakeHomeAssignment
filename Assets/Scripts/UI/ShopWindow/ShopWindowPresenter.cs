@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using KaifGames.TestClicker.Shop;
+using KaifGames.TestClicker.UI.ShopItemPopup;
 using KaifGames.TestClicker.UI.Window;
 
 namespace KaifGames.TestClicker.UI.ShopWindow
@@ -12,6 +13,7 @@ namespace KaifGames.TestClicker.UI.ShopWindow
         private readonly IShopItemsInventory _shopItemsInventory;
 
         private readonly List<ShopWindowItemPresenter> _itemPresenters = new();
+        private readonly ShopItemPopupPresenter _itemPopupPresenter;
 
         public ShopWindowPresenter(
             ShopWindowView view,
@@ -23,6 +25,7 @@ namespace KaifGames.TestClicker.UI.ShopWindow
             _shopItemsProvider = shopItemsProvider;
             _shopItemPurchaser = shopItemPurchaser;
             _shopItemsInventory = shopItemsInventory;
+            _itemPopupPresenter = new(_view.ItemPopup);
         }
 
         protected override void OnWindowActivated()
@@ -35,6 +38,7 @@ namespace KaifGames.TestClicker.UI.ShopWindow
         protected override void OnWindowDeactivated()
         {
             _view.SetActive(false);
+            _itemPopupPresenter.Hide();
         }
 
         protected override void OnWindowDismount()
@@ -75,7 +79,20 @@ namespace KaifGames.TestClicker.UI.ShopWindow
 
         private void OnItemClicked(IShopItem item)
         {
-            _shopItemPurchaser.TryPurchase(item);
+            var popupModel = new ShopItemPopupModel(item, _shopItemPurchaser);
+            popupModel.Purchased += OnItemPurchased;
+            popupModel.Exited += OnPopupExited;
+            _itemPopupPresenter.Render(popupModel);
+        }
+
+        private void OnItemPurchased()
+        {
+            _itemPopupPresenter.Hide();
+        }
+
+        private void OnPopupExited()
+        {
+            _itemPopupPresenter.Hide();
         }
     }
 }

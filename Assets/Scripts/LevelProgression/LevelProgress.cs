@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
+using KaifGames.TestClicker.Saves;
+using KaifGames.TestClicker.Saves.Models;
 
 namespace KaifGames.TestClicker.LevelProgression
 {
-    public sealed class LevelProgress : ILevelProgress
+    public sealed class LevelProgress : ILevelProgress, ISaveHandler<LevelProgressSaveData>
     {
         public int CurrentLevel { get; private set; }
         public int CurrentExperience { get; private set; }
@@ -28,6 +30,19 @@ namespace KaifGames.TestClicker.LevelProgression
                 ExperienceToLevelUp = GetExperienceToLevelUp(CurrentLevel);
                 LevelChanged?.Invoke(CurrentLevel);
             }
+        }
+
+        public void WriteToSave(LevelProgressSaveData data)
+        {
+            data.Level = CurrentLevel;
+            data.Experience = CurrentExperience;
+        }
+
+        public void ReadFromSave(LevelProgressSaveData data)
+        {
+            CurrentLevel = data.Level;
+            CurrentExperience = data.Experience;
+            ExperienceToLevelUp = GetExperienceToLevelUp(CurrentLevel);
         }
 
         private static int GetExperienceToLevelUp(int level)

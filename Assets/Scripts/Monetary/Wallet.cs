@@ -1,6 +1,9 @@
+using KaifGames.TestClicker.Saves;
+using KaifGames.TestClicker.Saves.Models;
+
 namespace KaifGames.TestClicker.Monetary
 {
-    public sealed class Wallet : IWallet
+    public sealed class Wallet : IWallet, ISaveHandler<WalletSaveData>
     {
         public int MoneyAmount => _moneyAmount;
 
@@ -26,6 +29,16 @@ namespace KaifGames.TestClicker.Monetary
             }
             SetAmount(_moneyAmount - amount);
             return true;
+        }
+
+        public void WriteToSave(WalletSaveData data)
+        {
+            data.MoneyAmount = _moneyAmount;
+        }
+
+        public void ReadFromSave(WalletSaveData data)
+        {
+            _moneyAmount = data.MoneyAmount;
         }
 
         private void SetAmount(int amount)

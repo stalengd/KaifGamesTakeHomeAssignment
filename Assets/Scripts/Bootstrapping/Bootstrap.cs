@@ -3,19 +3,24 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer.Unity;
+using KaifGames.TestClicker.Saves;
 
 namespace KaifGames.TestClicker.Bootstrapping
 {
     public sealed class Bootstrap : IAsyncStartable
     {
+        private readonly ISaveDispatcher _saveDispatcher;
+
         private const int GameSceneIndex = 1;
+
+        public Bootstrap(ISaveDispatcher saveDispatcher)
+        {
+            _saveDispatcher = saveDispatcher;
+        }
 
         public async Task StartAsync(CancellationToken cancellation = default)
         {
-            // Loading and stuff here
-
-            // Placeholder so that the compiler does not complain
-            await Task.Yield();
+            await _saveDispatcher.LoadAsync(cancellation);
             
             LoadGameScene();
         }

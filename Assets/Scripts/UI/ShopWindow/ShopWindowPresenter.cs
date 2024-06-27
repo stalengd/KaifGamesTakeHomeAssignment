@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using KaifGames.TestClicker.Shop;
 using KaifGames.TestClicker.UI.Window;
 
@@ -9,6 +10,8 @@ namespace KaifGames.TestClicker.UI.ShopWindow
         private readonly IShopItemsProvider _shopItemsProvider;
         private readonly IShopItemPurchaser _shopItemPurchaser;
         private readonly IShopItemsInventory _shopItemsInventory;
+
+        private readonly List<ShopWindowItemPresenter> _itemPresenters = new();
 
         public ShopWindowPresenter(
             ShopWindowView view,
@@ -34,24 +37,40 @@ namespace KaifGames.TestClicker.UI.ShopWindow
             _view.SetActive(false);
         }
 
-        private void OnItemAdded(IShopItem item)
+        protected override void OnWindowDismount()
         {
-            Refresh();
+            _shopItemsInventory.ItemAdded -= OnItemAdded;
+            ClearPresenters();
         }
 
         private void Refresh()
         {
             // Re-render whole stuff for now 
             _view.ClearItems();
+            ClearPresenters();
             foreach (var item in _shopItemsProvider.GetItems())
             {
                 var itemView = _view.AddItem();
-                itemView.SetName(item.Name);
-                itemView.SetIcon(item.Icon);
-                itemView.SetPurchased(_shopItemsInventory.HasItem(item.Id));
-                // Not the best solution because of capturing
-                itemView.Clicked += () => OnItemClicked(item);
+                var itemPresenter = new ShopWindowItemPresenter(itemView);
+                itemPresenter.Render(item, _shopItemsInventory.HasItem(item.Id));
+                itemPresenter.ItemClicked += OnItemClicked;
+                _itemPresenters.Add(itemPresenter);
             }
+        }
+
+        private void ClearPresenters()
+        {
+            foreach (var item in _itemPresenters)
+            {
+                item.ItemClicked -= OnItemClicked;
+                item.Hide();
+            }
+            _itemPresenters.Clear();
+        }
+
+        private void OnItemAdded(IShopItem item)
+        {
+            Refresh();
         }
 
         private void OnItemClicked(IShopItem item)
